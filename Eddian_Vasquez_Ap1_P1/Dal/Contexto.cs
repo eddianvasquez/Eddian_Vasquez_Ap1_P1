@@ -1,16 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Repaso.models;
 
-namespace Eddian_Vasquez_Ap1_P1.Dal
+namespace DAL
 {
-    public class Contexto DbContext
+    public class Contexto : DbContext
     {
-        public Dbset<aporte> Aportes { get; set; }
+        public DbSet<Aporte> Aportes { get; set; }
 
-    public contexto(DbContextOptions<Contexto> options :base(options){ }
+        public Contexto(DbContextOptions<Contexto> options) : base(options) { }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<aporte>()Haskey(app => a.AporteId)
-    }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            // Puedes configurar reglas como claves, restricciones únicas, etc.
+            modelBuilder.Entity<Aporte>().HasKey(a => a.AporteId);
+        }
     }
 }
