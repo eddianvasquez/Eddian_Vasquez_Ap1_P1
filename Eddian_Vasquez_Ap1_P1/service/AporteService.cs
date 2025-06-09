@@ -14,31 +14,37 @@ namespace repaso.Services
         {
             _contexto = contexto;
         }
-        public async Task<List<Aportes>> obtenerAportesasync()
+
+        public async Task<List<Aporte>> ObtenerAportesAsync()
         {
-            return await _contexto.Aportes.findAsync(int id)
-                {
-                public async Task CrearAporteAsync(Aporte aporte)
+            return await _contexto.Aportes.ToListAsync();
+        }
+
+        public async Task<Aporte> ObtenerAportePorIdAsync(int id)
+        {
+            return await _contexto.Aportes.FindAsync(id);
+        }
+
+        public async Task CrearAporteAsync(Aporte aporte)
         {
             Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<Aporte> entityEntry = _contexto.Aportes.Add(aporte);
             await _contexto.SaveChangesAsync();
         }
-        
-        public async Task EditarAportesasync(Aporte aporte)
-        {
-            _contexto.entry(aporte).state = EntityState.Modified;
-            await _contexto.SaveChangesAsync();
 
-        }
-        public async Task EliminarAportesasync(int id)
+        public async Task EditarAporteAsync(Aporte aporte)
         {
-            var aportes = await _contexto.Aportes.findAsync(id);
-            if (aportes != null)
+            _contexto.Entry(aporte).State = EntityState.Modified;
+            await _contexto.SaveChangesAsync();
+        }
+
+        public async Task EliminarAporteAsync(int id)
+        {
+            var aporte = await _contexto.Aportes.FindAsync(id);
+            if (aporte != null)
             {
                 _contexto.Aportes.Remove(aporte);
                 await _contexto.SaveChangesAsync();
             }
         }
-        }
     }
-        
+}
