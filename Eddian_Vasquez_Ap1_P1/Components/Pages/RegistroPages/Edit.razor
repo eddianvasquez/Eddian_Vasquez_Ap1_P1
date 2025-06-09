@@ -1,5 +1,73 @@
-﻿
+﻿@page "/Aportes/Edit/{id:int}"
+@using Eddian_Vasquez_Ap1_P1.models
+@using repaso.Services
+@inject AportesService AporteService
+@inject NavigationManager Nav
 
+
+<EditForm Model="aporte" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="mb-3">
+        <label>Persona:</label>
+        <InputText @bind-Value="aporte.Persona" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label>Monto:</label>
+        <InputNumber @bind-Value="aporte.Monto" class="form-control" />
+        </div>
+        <button class="btn btn-success me-2" type="submit">Actualizar</button>
+        <button class="btn btn-danger" type="button" @onclick="MostrarModal">Eliminar</button>
+</EditForm>
+@if (mostrarModal)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close" @onclick="CerrarModal"></button>
+                </div> 
+                <div class="modal-body">
+                    <p>¿Estás seguro que deseas eliminar este aporte?</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CerrarModal">Cancelar</button>
+                    <button class="btn btn-danger" @onclick="Eliminar">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 @code {
+    [Parameter] public int id { get; set; }
+    private Aporte aporte = new();
+    private bool mostrarModal = false;
 
+    protected override async Task OnInitializedAsync()
+    {
+        aporte = await AporteService.ObtenerAportePorIdAsync(id);
+    }
+    private async Task Guardar()
+    {
+        await AporteService.EditarAporteAsync(aporte);
+        Nav.NavigateTo("/aportes");
+    }
+
+    private void MostrarModal()
+    {
+        mostrarModal = true;
+    }
+
+    private void CerrarModal()
+    {
+        mostrarModal = false;
+    }
+
+    private async Task Eliminar()
+    {
+        await AporteService.EliminarAporteAsync(id);
+        mostrarModal = false;
+        Nav.NavigateTo("/aportes");
+    }
 }
