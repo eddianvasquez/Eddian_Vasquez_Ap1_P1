@@ -16,3 +16,147 @@
             <option value="observacion">Observación</option>
         </select>
     </div>
+    <div class="col-md-3">
+        <label>Búsqueda:</label>
+        <div class="input-group">
+            <input class="form-control" @bind="busqueda" placeholder="Buscar" />
+            <button class="btn btn-primary" @onclick="Filtrar">Buscar</button>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <label>Desde:</label>
+        <InputDate class="form-control" @bind-Value="fechaDesde" />
+    </div>
+    <div class="col-md-2">
+        <label>Hasta:</label>
+        <InputDate class="form-control" @bind-Value="fechaHasta" />
+    </div>
+<div class="col-md-2 d-flex align-items-end">
+        <button class="btn btn-secondary w-100" @onclick="LimpiarFiltros">🔄</button>
+    </div>
+</div>
+<div class="mb-3 text-end">
+    <button class="btn btn-success" @onclick="@(() => Nav.NavigateTo("/aportes/create"))">
+        <i class="bi bi-plus-circle"></i> Crear
+    </button>
+</div>
+
+        <table class="table table-bordered table-striped">
+            <thead class="table-light">
+                <tr>
+                    <th> AporteId</th>
+                    <th> Persona</th>
+                    <th> Monto</th>
+                    <th> Observacion</th>
+                    <th> Editar</th>
+                    <th> Eliminar</th>
+                </tr>
+            </thead>
+            <tbody>
+                 @if (aportesFiltrados.Count == 0)
+        {
+            <tr><td colspan="6" class="text-center">No hay aportes.</td></tr>
+        }
+        else
+        {
+            @foreach (var aporte in aportesFiltrados)
+            {
+                <tr>
+                    <td>@aporte.AporteId</td>
+                    <td>@aporte.Persona</td>
+                    <td>@aporte.Monto</td>
+                    <td>@aporte.Observacion</td>
+                    <td>
+                        <button class="btn btn-outline-success btn-sm" @onclick="@(() => Nav.NavigateTo($"/aportes/edit/{aporte.AporteId}"))">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                    </td>
+                    <td>
+                        <button class="btn btn-outline-danger btn-sm" @onclick="() => ConfirmarEliminar(aporte.AporteId)">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            }
+        }
+        </tbody>
+</table>
+
+<p><strong>Conteo:</strong> @aportesFiltrados.Count</p>
+<p><strong>Total:</strong> @aportesFiltrados.Sum(a => a.Monto)</p>
+
+@if (mostrarModalEliminar)
+{
+     <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close" @onclick="CancelarEliminar"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro que deseas eliminar este aporte?</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CancelarEliminar">Cancelar</button>
+                    <button class="btn btn-danger" @onclick="EliminarConfirmado">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<Aporte> aportes = new();
+    private List<Aporte> aportesFiltrados = new();
+    private string busqueda = "";
+    private string opcionFiltro = "";
+    private DateTime? fechaDesde = null;
+    private DateTime? fechaHasta = null;
+
+    private bool mostrarModalEliminar = false;
+    private int aporteIdAEliminar;
+    protected override async Task OnInitializedAsync()
+    {
+        aportes = await AporteService.ObtenerAportesAsync();
+        aportesFiltrados = aportes;
+    }
+
+    private void Filtrar()
+    {
+        aportesFiltrados = aportes.Where(a =>
+            (string.IsNullOrWhiteSpace(busqueda) ||
+                (opcionFiltro == "persona" && a.Persona.Contains(busqueda, StringComparison.OrdinalIgnoreCase)) ||
+                (opcionFiltro == "observacion" && a.Observacion.Contains(busqueda, StringComparison.OrdinalIgnoreCase)))
+            && (!fechaDesde.HasValue || a.Fecha.Date >= fechaDesde.Value.Date)
+            && (!fechaHasta.HasValue || a.Fecha.Date <= fechaHasta.Value.Date)
+        ).ToList();
+    }
+    private void LimpiarFiltros()
+    {
+        busqueda = "";
+        opcionFiltro = "";
+        fechaDesde = null;
+        fechaHasta = null;
+        aportesFiltrados = aportes;
+    }
+    private void ConfirmarEliminar(int aporteId)
+    {
+        aporteIdAEliminar = aporteId;
+        mostrarModalEliminar = true;
+    }
+
+    private void CancelarEliminar()
+    {
+        mostrarModalEliminar = false;
+    }
+
+    private async Task EliminarConfirmado()
+    {
+        await AporteService.EliminarAporteAsync(aporteIdAEliminar);
+        aportes = await AporteService.ObtenerAportesAsync();
+        Filtrar();
+        mostrarModalEliminar = false;
+    }
+}
+    
