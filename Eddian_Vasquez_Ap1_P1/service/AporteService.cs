@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Repaso.models;
 using DAL;
-using Eddian_Vasquez_Ap1_P1.Dal;
+using Eddian_Vasquez_Ap1_P1.models;
+
 
 
 namespace repaso.Services
