@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Repaso.models;
+using Eddian_Vasquez_Ap1_P1.models;
 
 namespace DAL
 {
