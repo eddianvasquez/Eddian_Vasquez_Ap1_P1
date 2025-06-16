@@ -8,10 +8,13 @@ namespace DAL
         public Contexto CreateDbContext(string[] args)
         {
             var optionsBuilder = new DbContextOptionsBuilder<Contexto>();
-            optionsBuilder.UseSqlServer("workstation id=Gestiondetecnico.mssql.somee.com;packet size=4096;user id=pollote_SQLLogin_2;pwd=9ohsqjlghz;data source=Gestiondetecnico.mssql.somee.com;persist security info=False;initial catalog=Gestiondetecnico;TrustServerCertificate=True;");
+
+
+            var connectionString = "workstation id=funciona.mssql.somee.com;packet size=4096;user id=eddianvasquez_SQLLogin_1;pwd=s3odkbyaki;data source=funciona.mssql.somee.com;persist security info=False;initial catalog=funciona;TrustServerCertificate=True";
+
+            optionsBuilder.UseSqlServer(connectionString);
 
             return new Contexto(optionsBuilder.Options);
         }
     }
 }
-

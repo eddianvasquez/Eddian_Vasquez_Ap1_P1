@@ -11,8 +11,21 @@ namespace DAL
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Puedes configurar reglas como claves, restricciones únicas, etc.
-            modelBuilder.Entity<Aporte>().HasKey(a => a.AporteId);
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Aporte>()
+                .Property(a => a.Nombre)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<Aporte>()
+                .Property(a => a.Nombre)
+                .IsRequired()
+                .HasMaxLength(250);
+
+            modelBuilder.Entity<Aporte>()
+                .Property(a => a.Monto)
+                .HasPrecision(18, 2);
         }
     }
 }
