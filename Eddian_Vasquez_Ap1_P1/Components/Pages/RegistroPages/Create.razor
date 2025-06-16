@@ -11,17 +11,14 @@
     <ValidationSummary />
 
     <div>
-        <label>Persona:</label>
-        <InputText @bind-Value="nuevoAporte.Persona" class="form-control" />
+        <label>Nombre:</label>
+        <InputText @bind-Value="nuevoAporte.Nombre" class="form-control" />
     </div>
     <div>
         <label>Monto:</label>
          <InputNumber @bind-Value="nuevoAporte.Monto" class="form-control" />
     </div>
-    <div>
-        <label>Observación:</label>
-        <InputText @bind-Value="nuevoAporte.Observacion" class="form-control" />
-    </div>
+   
     <button class="btn btn-primary" type="submit">Guardar</button>
 </EditForm>
 @code {

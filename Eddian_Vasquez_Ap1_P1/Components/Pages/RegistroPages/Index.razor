@@ -3,17 +3,15 @@
 @using repaso.Services
 @inject AportesService AporteService
 @inject NavigationManager Nav
-@inject repaso.Services.AportesService AporteService
 
 <h3 class="text-center mt-3">Registro de Aportes</h3>
 
 <div class="row my-3">
-	<div class="col-md-3">
+    <div class="col-md-3">
         <label>Filtrar por:</label>
         <select class="form-select" @bind="opcionFiltro">
             <option value="">Elija una opción</option>
-            <option value="persona">Persona</option>
-            <option value="observacion">Observación</option>
+            <option value="Nombre">Nombre</option>
         </select>
     </div>
     <div class="col-md-3">
@@ -31,55 +29,54 @@
         <label>Hasta:</label>
         <InputDate class="form-control" @bind-Value="fechaHasta" />
     </div>
-<div class="col-md-2 d-flex align-items-end">
+    <div class="col-md-2 d-flex align-items-end">
         <button class="btn btn-secondary w-100" @onclick="LimpiarFiltros">🔄</button>
     </div>
 </div>
+
 <div class="mb-3 text-end">
     <button class="btn btn-success" @onclick="@(() => Nav.NavigateTo("/aportes/create"))">
         <i class="bi bi-plus-circle"></i> Crear
     </button>
 </div>
 
-        <table class="table table-bordered table-striped">
-            <thead class="table-light">
-                <tr>
-                    <th> AporteId</th>
-                    <th> Persona</th>
-                    <th> Monto</th>
-                    <th> Observacion</th>
-                    <th> Editar</th>
-                    <th> Eliminar</th>
-                </tr>
-            </thead>
-            <tbody>
-                 @if (aportesFiltrados.Count == 0)
+<table class="table table-bordered table-striped">
+    <thead class="table-light">
+        <tr>
+            <th>AporteId</th>
+            <th>Nombre</th>
+            <th>Monto</th>
+            <th>Editar</th>
+            <th>Eliminar</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (aportesFiltrados.Count == 0)
         {
-            <tr><td colspan="6" class="text-center">No hay aportes.</td></tr>
+            <tr><td colspan="5" class="text-center">No hay aportes.</td></tr>
         }
         else
         {
             @foreach (var aporte in aportesFiltrados)
             {
                 <tr>
-                    <td>@aporte.AporteId</td>
-                    <td>@aporte.Persona</td>
+                    <td>@aporte.AportesId</td>
+                    <td>@aporte.Nombre</td>
                     <td>@aporte.Monto</td>
-                    <td>@aporte.Observacion</td>
                     <td>
-                        <button class="btn btn-outline-success btn-sm" @onclick="@(() => Nav.NavigateTo($"/aportes/edit/{aporte.AporteId}"))">
+                        <button class="btn btn-outline-success btn-sm" @onclick="@(() => Nav.NavigateTo($"/aportes/edit/{aporte.AportesId}"))">
                             <i class="bi bi-pencil"></i>
                         </button>
                     </td>
                     <td>
-                        <button class="btn btn-outline-danger btn-sm" @onclick="() => ConfirmarEliminar(aporte.AporteId)">
+                        <button class="btn btn-outline-danger btn-sm" @onclick="() => ConfirmarEliminar(aporte.AportesId)">
                             <i class="bi bi-trash"></i>
                         </button>
                     </td>
                 </tr>
             }
         }
-        </tbody>
+    </tbody>
 </table>
 
 <p><strong>Conteo:</strong> @aportesFiltrados.Count</p>
@@ -87,7 +84,7 @@
 
 @if (mostrarModalEliminar)
 {
-     <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -111,11 +108,12 @@
     private List<Aporte> aportesFiltrados = new();
     private string busqueda = "";
     private string opcionFiltro = "";
-    private DateTime? fechaDesde = null;
-    private DateTime? fechaHasta = null;
+    private DateOnly? fechaDesde = null;
+    private DateOnly? fechaHasta = null;
 
     private bool mostrarModalEliminar = false;
     private int aporteIdAEliminar;
+
     protected override async Task OnInitializedAsync()
     {
         aportes = await AporteService.ObtenerAportesAsync();
@@ -126,12 +124,12 @@
     {
         aportesFiltrados = aportes.Where(a =>
             (string.IsNullOrWhiteSpace(busqueda) ||
-                (opcionFiltro == "persona" && a.Persona.Contains(busqueda, StringComparison.OrdinalIgnoreCase)) ||
-                (opcionFiltro == "observacion" && a.Observacion.Contains(busqueda, StringComparison.OrdinalIgnoreCase)))
-            && (!fechaDesde.HasValue || a.Fecha.Date >= fechaDesde.Value.Date)
-            && (!fechaHasta.HasValue || a.Fecha.Date <= fechaHasta.Value.Date)
+             (opcionFiltro == "Nombre" && a.Nombre.Contains(busqueda, StringComparison.OrdinalIgnoreCase)))
+            && (!fechaDesde.HasValue || a.Fecha >= fechaDesde.Value)
+            && (!fechaHasta.HasValue || a.Fecha <= fechaHasta.Value)
         ).ToList();
     }
+
     private void LimpiarFiltros()
     {
         busqueda = "";
@@ -140,6 +138,7 @@
         fechaHasta = null;
         aportesFiltrados = aportes;
     }
+
     private void ConfirmarEliminar(int aporteId)
     {
         aporteIdAEliminar = aporteId;
@@ -159,4 +158,3 @@
         mostrarModalEliminar = false;
     }
 }
-    
